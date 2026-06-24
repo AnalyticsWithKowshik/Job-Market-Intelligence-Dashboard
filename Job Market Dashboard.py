@@ -1,0 +1,33 @@
+import streamlit as st
+import pandas as pd
+df=pd.read_excel("job_dataset.xlsx")
+df=df.rename(columns={df.columns[0]:"job_title"})
+st.title("Job Market Intelligence Dashboard")
+st.write("Build by Vellanki Krishna Kowshik")
+col1,col2=st.columns(2)
+with col1:
+    st.metric("Total Jobs",len(df))
+with col2:
+    st.metric("Average Salary",f"${int(df['salary_year_avg'].mean()):,}")
+st.subheader("Top 10 Job Titles")
+top_jobs= df["job_title"].value_counts().head(10)
+st.bar_chart(top_jobs)
+st.subheader("Top 10 skills")
+skills=df["job_skills"]
+skills=skills.str.replace("[","",regex=False)
+skills=skills.str.replace("]","",regex=False)
+skills=skills.str.replace("","",regex=False)
+all_skills=skills.str.split(",").explode()
+all_skills=all_skills.str.strip()
+top_skills=all_skills.value_counts().head(10)
+st.bar_chart(top_skills)
+st.subheader("Top 10 Highest Paying Roles")
+top_roles=(df.groupby("job_title")["salary_year_avg"].mean().sort_values(ascending=False).head(10))
+st.bar_chart(top_roles)
+top_companies= (df["company_name"].value_counts().head(10))
+st.subheader("Top Hiring Companies")
+st.bar_chart(top_companies)
+st.subheader("Salary Distribution")
+st.line_chart(df["salary_year_avg"].dropna())
+st.sidebar.title("Dashboard Menu")
+st.sidebar.write("Job Market Analysis")
